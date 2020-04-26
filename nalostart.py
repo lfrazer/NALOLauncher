@@ -15,6 +15,7 @@ class NALOStart:
     nalo_folder = "G:\\Games\\SteamLibrary\\steamapps\\common\\Natural Locomotion\\"
     nalo_exe = ""
     nalo_settings = ""
+    scroll_clicks = -100
 
     #try:
     #   while True:
@@ -23,39 +24,42 @@ class NALOStart:
     disordered_monitors = True
 
     def initpaths(self):
-        self.nalo_exe = self.nalo_folder + "naturallocomotion.exe"
+        # "steam://rungameid/798810"  (SteamID)
+        self.nalo_exe = self.nalo_folder + "naturallocomotion.exe"  
         self.nalo_settings = self.nalo_folder + "settings.json"
 
     def startNALO(self):
-        #os.system(nalo_exe)
-        proc_args = [self.nalo_exe]
+        #os.startfile(self.nalo_exe)
+        proc_args = ['cmd', '/c', 'start', 'steam://run/798810']
         subprocess.Popen(proc_args)
 
     def setNALOHandedConfig(self, left_handed_flag):
-        fp = open(nalo_settings, "r")
-        settings = json.load(fp)
-        fp.close()
+        if os.path.isfile(self.nalo_settings):
+            fp = open(self.nalo_settings, "r")
+            settings = json.load(fp)
+            fp.close()
 
-        if left_handed_flag:
-            settings["left_handed"] = "yes"
+            if left_handed_flag:
+                settings["left_handed"] = "yes"
+            else:
+                settings["left_handed"] = "no"
+            
+            fp = open(self.nalo_settings, "w")
+            json.dump(settings, fp)
+            fp.close()
         else:
-            settings["left_handed"] = "no"
-        
-        fp = open(nalo_settings, "w")
-        json.dump(settings, fp)
-        fp.close()
-
+            print("Left-handed config setup failed, could not find file: " + self.nalo_settings)
         return
 
-    def clickbutton(self, imgpath):
+    def movemouse(self, imgpath):
         startpos = None
         while startpos is None:
-            try:
-                startpos = pyautogui.locateOnScreen(imgpath, minSearchTime=30, grayscale=True, confidence=0.45)
-                if(startpos is None):
-                    print("Failed to detect img: " + imgpath)
-            except:
-                print("Unexpected error:", sys.exc_info()[0])
+            #try:
+            startpos = pyautogui.locateOnScreen(imgpath, minSearchTime=30, grayscale=True, confidence=0.45)
+            if(startpos is None):
+                print("Failed to detect img: " + imgpath)
+            #except:
+            #    print("Unexpected error:", sys.exc_info()[0])
 
         print("Clicking image: " + imgpath + " startpos=" + str(startpos) )
         startpos_center = pyautogui.center(startpos)
@@ -63,17 +67,42 @@ class NALOStart:
 
         clickx = int(startpos_center.x)
         clicky = int(startpos_center.y)
-        if (disordered_monitors):
+        if (self.disordered_monitors):
             clickx = clickx - (int(chilimangoes.screen_size[0]) / 2)
 
         ctypes.windll.user32.SetCursorPos( clickx, clicky)
+
+    def clickbutton(self, imgpath):
+        self.movemouse(imgpath)
         time.sleep(0.25)
         pyautogui.click()
 
+    def startprofile(self):
+        
+        # need to put the mouse over the game selection scroll UI before scrolling.. or it won't work
+        if self.scroll_clicks != 0:
+            self.movemouse("bladesorcery_select.png")
+            time.sleep(0.1)
+            pyautogui.scroll(self.scroll_clicks)
+        
+        time.sleep(0.25)
+        self.clickbutton("skyrimvr_select.png")
+        self.clickbutton("start_profile.png")
+
+
 if __name__ == "__main__":
+
+    argparser = argparse.ArgumentParser(description="NALO Launcher")
+    argparser.add_argument("--gameimage", "-g", default="skyrimvr_select.png")
+    argparser.add_argument("--scroll", "-s", type=int, default=0)
+    argparser.add_argument("--lefthanded", "-l", type=int, default=0)
+
+    args = argparser.parse_args()
+    print("Program Args: " + str(args))
 
     ns = NALOStart() 
     ns.initpaths()
+    ns.setNALOHandedConfig(True)
     ns.startNALO()
 
     pyautogui.screenshot = chilimangoes.grab_screen
@@ -81,10 +110,9 @@ if __name__ == "__main__":
     pyautogui.Size = lambda x, y: chilimangoes.screen_size
 
     # wait a bit for NALO to initalize
-    time.sleep(2.0)
+    time.sleep(3.0)
 
-    ns.clickbutton("skyrimvr_select.png")
-    ns.clickbutton("start_profile.png")
+    ns.startprofile()
 
 
 
