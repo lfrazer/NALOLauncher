@@ -17,9 +17,6 @@ class NALOStart:
     nalo_settings = ""
     scroll_clicks = -100
 
-    #try:
-    #   while True:
-
     # set this to true only if your monitors are in a strange order (for example, #2 is to the left of #1)
     disordered_monitors = True
 
@@ -77,16 +74,16 @@ class NALOStart:
         time.sleep(0.25)
         pyautogui.click()
 
-    def startprofile(self):
+    def startprofile(self, game_select, scroll):
         
         # need to put the mouse over the game selection scroll UI before scrolling.. or it won't work
-        if self.scroll_clicks != 0:
+        if scroll != 0:
             self.movemouse("bladesorcery_select.png")
             time.sleep(0.1)
-            pyautogui.scroll(self.scroll_clicks)
+            pyautogui.scroll(scroll)
         
         time.sleep(0.25)
-        self.clickbutton("skyrimvr_select.png")
+        self.clickbutton(game_select)
         self.clickbutton("start_profile.png")
 
 
@@ -102,7 +99,7 @@ if __name__ == "__main__":
 
     ns = NALOStart() 
     ns.initpaths()
-    ns.setNALOHandedConfig(True)
+    ns.setNALOHandedConfig( bool(args.lefthanded) )
     ns.startNALO()
 
     pyautogui.screenshot = chilimangoes.grab_screen
@@ -112,7 +109,7 @@ if __name__ == "__main__":
     # wait a bit for NALO to initalize
     time.sleep(3.0)
 
-    ns.startprofile()
+    ns.startprofile(args.gameimage, args.scroll)
 
 
 
