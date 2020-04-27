@@ -52,7 +52,7 @@ class NALOStart:
         startpos = None
         while startpos is None:
             #try:
-            startpos = pyautogui.locateOnScreen(imgpath, minSearchTime=30, grayscale=True, confidence=0.45)
+            startpos = pyautogui.locateOnScreen(imgpath, minSearchTime=30, grayscale=True, confidence=0.6)
             if(startpos is None):
                 print("Failed to detect img: " + imgpath)
             #except:
