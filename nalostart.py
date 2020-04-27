@@ -20,6 +20,19 @@ class NALOStart:
     # set this to true only if your monitors are in a strange order (for example, #2 is to the left of #1)
     disordered_monitors = True
 
+    def __init__(self):
+        configfile = "config.json"
+        if os.path.isfile(configfile):
+            fp = open(configfile, "r")
+            config = json.load(fp)
+            fp.close()
+
+            self.nalo_folder = config["nalo_folder"]
+            self.disordered_monitors = config["disordered_monitors"]
+        else:
+            print("Could not open config JSON file!")
+        self.initpaths()
+
     def initpaths(self):
         # "steam://rungameid/798810"  (SteamID)
         self.nalo_exe = self.nalo_folder + "naturallocomotion.exe"  
@@ -74,13 +87,13 @@ class NALOStart:
         time.sleep(0.25)
         pyautogui.click()
 
-    def startprofile(self, game_select, scroll):
+    def startprofile(self, game_select, scroll_steps):
         
         # need to put the mouse over the game selection scroll UI before scrolling.. or it won't work
-        if scroll != 0:
+        if scroll_steps != 0:
             self.movemouse("bladesorcery_select.png")
             time.sleep(0.1)
-            pyautogui.scroll(scroll)
+            pyautogui.scroll(scroll_steps)
         
         time.sleep(0.25)
         self.clickbutton(game_select)
@@ -91,14 +104,13 @@ if __name__ == "__main__":
 
     argparser = argparse.ArgumentParser(description="NALO Launcher")
     argparser.add_argument("--gameimage", "-g", default="skyrimvr_select.png")
-    argparser.add_argument("--scroll", "-s", type=int, default=0)
+    argparser.add_argument("--scroll", "-s", type=int, default=-1)
     argparser.add_argument("--lefthanded", "-l", type=int, default=0)
 
     args = argparser.parse_args()
     print("Program Args: " + str(args))
 
     ns = NALOStart() 
-    ns.initpaths()
     ns.setNALOHandedConfig( bool(args.lefthanded) )
     ns.startNALO()
 
