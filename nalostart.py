@@ -8,7 +8,7 @@ import chilimangoes
 import ctypes
 import ctypes.wintypes
 import argparse
-
+import psutil
 
 class NALOStart:
 
@@ -78,7 +78,7 @@ class NALOStart:
         clickx = int(startpos_center.x)
         clicky = int(startpos_center.y)
         if (self.disordered_monitors):
-            clickx = clickx - (int(chilimangoes.screen_size[0]) / 2)
+            clickx = clickx - (int(chilimangoes.screen_size[0] / 2))
 
         ctypes.windll.user32.SetCursorPos( clickx, clicky)
 
@@ -109,6 +109,18 @@ if __name__ == "__main__":
 
     args = argparser.parse_args()
     print("Program Args: " + str(args))
+
+    # try to kill NALO if its running
+    nalo_pid = 0
+
+    for proc in psutil.process_iter(['pid', 'name']):
+        if proc.info["name"] == "natural_locomotion_launcher.exe":
+            nalo_pid = proc.info["pid"]
+            print("Found nalo process running.. Attempting to terminate.")
+            break
+
+    if nalo_pid != 0:
+        psutil.Process(nalo_pid).terminate()
 
     ns = NALOStart() 
     ns.setNALOHandedConfig( bool(args.lefthanded) )
