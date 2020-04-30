@@ -111,16 +111,15 @@ if __name__ == "__main__":
     print("Program Args: " + str(args))
 
     # try to kill NALO if its running
-    nalo_pid = 0
+    nalo_procs = []
 
     for proc in psutil.process_iter(['pid', 'name']):
-        if proc.info["name"] == "natural_locomotion_launcher.exe":
-            nalo_pid = proc.info["pid"]
-            print("Found nalo process running.. Attempting to terminate.")
-            break
+        if proc.info["name"] == "natural_locomotion_launcher.exe" or proc.info["name"] == "naturallocomotion.exe":
+            nalo_procs.append(proc)
+            print("Found nalo process running.. PID=" + str(proc.info["pid"]))
 
-    if nalo_pid != 0:
-        psutil.Process(nalo_pid).terminate()
+    for proc in nalo_procs:
+        proc.terminate()
 
     ns = NALOStart() 
     ns.setNALOHandedConfig( bool(args.lefthanded) )
