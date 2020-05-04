@@ -61,15 +61,20 @@ class NALOStart:
             print("Left-handed config setup failed, could not find file: " + self.nalo_settings)
         return
 
-    def movemouse(self, imgpath):
+    def movemouse(self, imgpath, num_attempts=5):
         startpos = None
-        while startpos is None:
+        count = 0
+        while startpos is None and count < num_attempts:
             #try:
+            count += 1
             startpos = pyautogui.locateOnScreen(imgpath, minSearchTime=30, grayscale=True, confidence=0.6)
             if(startpos is None):
                 print("Failed to detect img: " + imgpath)
             #except:
             #    print("Unexpected error:", sys.exc_info()[0])
+
+        if startpos is None:
+            return False
 
         print("Clicking image: " + imgpath + " startpos=" + str(startpos) )
         startpos_center = pyautogui.center(startpos)
@@ -81,11 +86,14 @@ class NALOStart:
             clickx = clickx - (int(chilimangoes.screen_size[0] / 2))
 
         ctypes.windll.user32.SetCursorPos( clickx, clicky)
+        return True
 
     def clickbutton(self, imgpath):
-        self.movemouse(imgpath)
-        time.sleep(0.25)
-        pyautogui.click()
+        moveres = self.movemouse(imgpath)
+        if moveres:
+            time.sleep(0.25)
+            pyautogui.click()
+        return moveres
 
     def startprofile(self, game_select, scroll_steps):
         
@@ -97,7 +105,8 @@ class NALOStart:
         
         time.sleep(0.25)
         self.clickbutton(game_select)
-        self.clickbutton("start_profile.png")
+        return self.clickbutton("start_profile.png")
+
 
 
 if __name__ == "__main__":
@@ -106,6 +115,8 @@ if __name__ == "__main__":
     argparser.add_argument("--gameimage", "-g", default="skyrimvr_select.png")
     argparser.add_argument("--scroll", "-s", type=int, default=-1)
     argparser.add_argument("--lefthanded", "-l", type=int, default=0)
+    argparser.add_argument("--proglaunch", "-p", default="")
+    argparser.add_argument("--progarg", "-a", default="")
 
     args = argparser.parse_args()
     print("Program Args: " + str(args))
@@ -132,7 +143,14 @@ if __name__ == "__main__":
     # wait a bit for NALO to initalize
     time.sleep(3.0)
 
-    ns.startprofile(args.gameimage, args.scroll)
+    startres = ns.startprofile(args.gameimage, args.scroll)
+
+    if startres and args.proglaunch != "":
+        proglaunch_cmd = [args.proglaunch]
+        if args.progarg != "":
+            proglaunch_cmd.append(args.progarg)
+        subprocess.Popen(proglaunch_cmd)
+        
 
 
 
