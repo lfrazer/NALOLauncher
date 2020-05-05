@@ -67,7 +67,7 @@ class NALOStart:
         while startpos is None and count < num_attempts:
             #try:
             count += 1
-            startpos = pyautogui.locateOnScreen(imgpath, minSearchTime=30, grayscale=True) #, confidence=0.6
+            startpos = pyautogui.locateOnScreen(imgpath, minSearchTime=30, grayscale=True, confidence=0.6)
             if(startpos is None):
                 print("Failed to detect img: " + imgpath)
             #except:
