@@ -53,7 +53,8 @@ def grab_screen(region=None):
     """
     bitmap = None
     try:
-        screen = CreateDC(c_char_p('DISPLAY'),NULL,NULL,NULL)
+        #screen = CreateDC(c_char_p('DISPLAY'),NULL,NULL,NULL)  # for Python2
+        screen = CreateDC(b'DISPLAY', NULL, NULL, NULL) # for Python3
         screen_copy = CreateCompatibleDC(screen)
 
         if region:
@@ -80,7 +81,7 @@ def grab_screen(region=None):
 
         bitmap_header = pack('LHHHH', calcsize('LHHHH'), width, height, 1, 24)
         bitmap_buffer = c_buffer(bitmap_header)
-        bitmap_bits = c_buffer(' ' * (height * ((width * 3 + 3) & -4)))
+        bitmap_bits = c_buffer(b' ' * (height * ((width * 3 + 3) & -4)))
         got_bits = GetDIBits(screen_copy, bitmap, 0, height, bitmap_bits, bitmap_buffer, 0)
         if got_bits == NULL or got_bits == ERROR_INVALID_PARAMETER:
             print('grab_screen: Error calling GetDIBits. Returned {0}.'.format(got_bits))
