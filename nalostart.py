@@ -107,6 +107,35 @@ class NALOStart:
         self.clickbutton(game_select)
         return self.clickbutton("start_profile.png")
 
+    def checkerr(self, errimg, num_attempts=1):
+        startpos = None
+        imgpath = errimg
+        count = 0
+        while startpos is None and count < num_attempts:
+            #try:
+            count += 1
+            startpos = pyautogui.locateOnScreen(imgpath, minSearchTime=3, grayscale=True, confidence=0.6)
+            if(startpos is None):
+                print("Failed to detect img: " + imgpath)
+            #except:
+            #    print("Unexpected error:", sys.exc_info()[0])
+
+        if startpos is None:
+            return False
+        
+        return True
+
+
+def killprocbyname(procname):
+    procs_tokill = []
+
+    for proc in psutil.process_iter(['pid', 'name']):
+        if proc.info["name"] == procname:
+            procs_tokill.append(proc)
+            print("Found process [to be killed] running.. PID=" + str(proc.info["pid"]))
+
+    for proc in procs_tokill:
+        proc.terminate()
 
 
 if __name__ == "__main__":
@@ -117,20 +146,14 @@ if __name__ == "__main__":
     argparser.add_argument("--lefthanded", "-l", type=int, default=0)
     argparser.add_argument("--proglaunch", "-p", default="")
     argparser.add_argument("--progarg", "-a", default="")
+    argparser.add_argument("--steamerrcheck", "-e", default="steamvr_err.png")
 
     args = argparser.parse_args()
     print("Program Args: " + str(args))
 
     # try to kill NALO if its running
-    nalo_procs = []
-
-    for proc in psutil.process_iter(['pid', 'name']):
-        if proc.info["name"] == "natural_locomotion_launcher.exe" or proc.info["name"] == "naturallocomotion.exe":
-            nalo_procs.append(proc)
-            print("Found nalo process running.. PID=" + str(proc.info["pid"]))
-
-    for proc in nalo_procs:
-        proc.terminate()
+    killprocbyname("natural_locomotion_launcher.exe")
+    killprocbyname("naturallocomotion.exe")
 
     ns = NALOStart() 
     ns.setNALOHandedConfig( bool(args.lefthanded) )
@@ -143,14 +166,25 @@ if __name__ == "__main__":
     # wait a bit for NALO to initalize
     time.sleep(3.0)
 
-    startres = ns.startprofile(args.gameimage, args.scroll)
-
-    if startres and args.proglaunch != "":
-        proglaunch_cmd = [args.proglaunch]
-        if args.progarg != "":
-            proglaunch_cmd.append(args.progarg)
-        subprocess.Popen(proglaunch_cmd)
+    # check for steam VR errors
+    if(args.steamerrcheck != "" and ns.checkerr(args.steamerrcheck)):
+        # restart steamvr and try again..?
+        killprocbyname("natural_locomotion_launcher.exe")
+        killprocbyname("naturallocomotion.exe")
+        killprocbyname("steamvr.exe")
+        print("SteamVR error.. trying to restart everything..")
+        time.sleep(20.0)
+        #input("Press any key to exit..")
         
+
+    else:
+        startres = ns.startprofile(args.gameimage, args.scroll)
+
+        if startres and args.proglaunch != "":
+            proglaunch_cmd = [args.proglaunch]
+            if args.progarg != "":
+                proglaunch_cmd.append(args.progarg)
+            subprocess.Popen(proglaunch_cmd)
 
 
 
