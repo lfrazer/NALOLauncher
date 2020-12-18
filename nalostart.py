@@ -57,6 +57,7 @@ class NALOStart:
             fp = open(self.nalo_settings, "w")
             json.dump(settings, fp)
             fp.close()
+            print("Setting left handed flag: " + str(left_handed_flag))
         else:
             print("Left-handed config setup failed, could not find file: " + self.nalo_settings)
         return
@@ -146,7 +147,8 @@ if __name__ == "__main__":
     argparser.add_argument("--lefthanded", "-l", type=int, default=0)
     argparser.add_argument("--proglaunch", "-p", default="")
     argparser.add_argument("--progarg", "-a", default="")
-    argparser.add_argument("--steamerrcheck", "-e", default="steamvr_err.png")
+    #disabled by default for now
+    argparser.add_argument("--steamerrcheck", "-e", default="") # default="steamvr_err.png" 
 
     args = argparser.parse_args()
     print("Program Args: " + str(args))
@@ -171,9 +173,10 @@ if __name__ == "__main__":
         # restart steamvr and try again..?
         killprocbyname("natural_locomotion_launcher.exe")
         killprocbyname("naturallocomotion.exe")
-        killprocbyname("steamvr.exe")
+        killprocbyname("vrserver.exe")
+        killprocbyname("HtcConnectionUtility.exe")
         print("SteamVR error.. trying to restart everything..")
-        time.sleep(20.0)
+        time.sleep(30.0)
         #input("Press any key to exit..")
         
 
