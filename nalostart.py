@@ -62,17 +62,18 @@ class NALOStart:
             print("Left-handed config setup failed, could not find file: " + self.nalo_settings)
         return
 
-    def movemouse(self, imgpath, num_attempts=5):
-        startpos = None
+    # move mouse to image, give startpos as 2d vector if position is already detected
+    def movemouse(self, imgpath, num_attempts=5, startpos=None):
         count = 0
-        while startpos is None and count < num_attempts:
-            #try:
-            count += 1
-            startpos = pyautogui.locateOnScreen(imgpath, minSearchTime=30, grayscale=True, confidence=0.6)
-            if(startpos is None):
-                print("Failed to detect img: " + imgpath)
-            #except:
-            #    print("Unexpected error:", sys.exc_info()[0])
+        if startpos is None:
+            while startpos is None and count < num_attempts:
+                #try:
+                count += 1
+                startpos = pyautogui.locateOnScreen(imgpath, minSearchTime=30, grayscale=True, confidence=0.6)
+                if(startpos is None):
+                    print("Failed to detect img: " + imgpath)
+                #except:
+                #    print("Unexpected error:", sys.exc_info()[0])
 
         if startpos is None:
             return False
@@ -96,7 +97,7 @@ class NALOStart:
             pyautogui.click()
         return moveres
 
-    def startprofile(self, game_select, scroll_steps):
+    def startprofile(self, game_select, scroll_steps, left_handed_flag):
         
         # need to put the mouse over the game selection scroll UI before scrolling.. or it won't work
         if scroll_steps != 0:
@@ -104,9 +105,25 @@ class NALOStart:
             time.sleep(0.1)
             pyautogui.scroll(scroll_steps)
         
+        # select the game
         time.sleep(0.25)
         self.clickbutton(game_select)
-        return self.clickbutton("start_profile.png")
+        
+        # start profile after game selected
+        startclickres = self.clickbutton("start_profile.png")
+
+        # try to toggle left handed mode on UI if needed
+        lefthandimg = "left_handed_off.PNG"
+        if left_handed_flag == False:
+            lefthandimg = "left_handed_on.png"
+
+        lefthandcheckboxpos = pyautogui.locateOnScreen(lefthandimg, minSearchTime=5, grayscale=True, confidence=0.99)
+        if lefthandcheckboxpos is not None:
+            self.movemouse(lefthandimg, 1, lefthandcheckboxpos)
+            time.sleep(0.25)
+            pyautogui.click()
+
+        return startclickres
 
     def checkerr(self, errimg, num_attempts=1):
         startpos = None
@@ -181,9 +198,10 @@ if __name__ == "__main__":
         
 
     else:
-        startres = ns.startprofile(args.gameimage, args.scroll)
+        startres = ns.startprofile(args.gameimage, args.scroll, bool(args.lefthanded))
 
         if startres and args.proglaunch != "":
+            # launch application after NALO is ready
             proglaunch_cmd = [args.proglaunch]
             if args.progarg != "":
                 proglaunch_cmd.append(args.progarg)
