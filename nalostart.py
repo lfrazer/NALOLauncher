@@ -166,6 +166,7 @@ if __name__ == "__main__":
     argparser.add_argument("--progarg", "-a", default="")
     #disabled by default for now
     argparser.add_argument("--steamerrcheck", "-e", default="") # default="steamvr_err.png" 
+    argparser.add_argument("--minimizenalo", "-m", default=True)
 
     args = argparser.parse_args()
     print("Program Args: " + str(args))
@@ -201,6 +202,10 @@ if __name__ == "__main__":
         startres = ns.startprofile(args.gameimage, args.scroll, bool(args.lefthanded))
 
         if startres and args.proglaunch != "":
+            # try to minimize NALO if option is set
+            if args.minimizenalo is True:
+                pyautogui.hotkey('winleft', 'down')
+
             # launch application after NALO is ready
             proglaunch_cmd = [args.proglaunch]
             if args.progarg != "":
