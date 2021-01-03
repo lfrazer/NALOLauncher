@@ -5,7 +5,7 @@ Updated to support new NALO version with dark mode UI as of the end of 2020
 # Setup
 Install packages: pyautogui opencv-python psutil 
 using pip.  
-Make sure to setup paths and your monitor ordering in config.json
+Make sure to setup paths and your monitor ordering in config.json. 
 Disable auto-minimize option in NALO as the script can now perform this action
 
 ## Example command line (Blade & Sorcery)
