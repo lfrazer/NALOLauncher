@@ -135,8 +135,9 @@ class NALOStart:
             startpos = pyautogui.locateOnScreen(imgpath, minSearchTime=3, grayscale=True, confidence=0.6)
             if(startpos is None):
                 print("Failed to detect img: " + imgpath)
-            #except:
-            #    print("Unexpected error:", sys.exc_info()[0])
+            else:
+                if self.movemouse(imgpath, 1, startpos) is True:
+                    pyautogui.click()
 
         if startpos is None:
             return False
@@ -164,8 +165,8 @@ if __name__ == "__main__":
     argparser.add_argument("--lefthanded", "-l", type=int, default=0)
     argparser.add_argument("--proglaunch", "-p", default="")
     argparser.add_argument("--progarg", "-a", default="")
-    #disabled by default for now
-    argparser.add_argument("--steamerrcheck", "-e", default="") # default="steamvr_err.png" 
+    # Re-enabling because new NALO feature to check for this error makes it a bit simpler..
+    argparser.add_argument("--steamerrcheck", "-e", default="restart.png")
     argparser.add_argument("--minimizenalo", "-m", default=True)
 
     args = argparser.parse_args()
@@ -189,28 +190,28 @@ if __name__ == "__main__":
     # check for steam VR errors
     if(args.steamerrcheck != "" and ns.checkerr(args.steamerrcheck)):
         # restart steamvr and try again..?
-        killprocbyname("natural_locomotion_launcher.exe")
-        killprocbyname("naturallocomotion.exe")
-        killprocbyname("vrserver.exe")
-        killprocbyname("HtcConnectionUtility.exe")
+        #killprocbyname("natural_locomotion_launcher.exe")
+        #killprocbyname("naturallocomotion.exe")
+        #killprocbyname("vrserver.exe")
+        #killprocbyname("HtcConnectionUtility.exe")
         print("SteamVR error.. trying to restart everything..")
-        time.sleep(30.0)
+        time.sleep(45.0)
         #input("Press any key to exit..")
+        print("SteamVR should now be restarted.")
         
 
-    else:
-        startres = ns.startprofile(args.gameimage, args.scroll, bool(args.lefthanded))
+    startres = ns.startprofile(args.gameimage, args.scroll, bool(args.lefthanded))
 
-        if startres and args.proglaunch != "":
-            # try to minimize NALO if option is set
-            if args.minimizenalo is True:
-                pyautogui.hotkey('winleft', 'down')
+    if startres and args.proglaunch != "":
+        # try to minimize NALO if option is set
+        if args.minimizenalo is True:
+            pyautogui.hotkey('winleft', 'down')
 
-            # launch application after NALO is ready
-            proglaunch_cmd = [args.proglaunch]
-            if args.progarg != "":
-                proglaunch_cmd.append(args.progarg)
-            subprocess.Popen(proglaunch_cmd)
+        # launch application after NALO is ready
+        proglaunch_cmd = [args.proglaunch]
+        if args.progarg != "":
+            proglaunch_cmd.append(args.progarg)
+        subprocess.Popen(proglaunch_cmd)
 
 
 
