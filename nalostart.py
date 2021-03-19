@@ -69,7 +69,7 @@ class NALOStart:
             while startpos is None and count < num_attempts:
                 #try:
                 count += 1
-                startpos = pyautogui.locateOnScreen(imgpath, minSearchTime=30, grayscale=True, confidence=0.6)
+                startpos = pyautogui.locateOnScreen(imgpath, minSearchTime=30, grayscale=True, confidence=0.75)
                 if(startpos is None):
                     print("Failed to detect img: " + imgpath)
                 #except:
@@ -90,10 +90,10 @@ class NALOStart:
         ctypes.windll.user32.SetCursorPos( ctypes.c_long(clickx), ctypes.c_long(clicky) )
         return True
 
-    def clickbutton(self, imgpath):
+    def clickbutton(self, imgpath, sleep_time=0.25):
         moveres = self.movemouse(imgpath)
         if moveres:
-            time.sleep(0.25)
+            time.sleep(sleep_time)
             pyautogui.click()
         return moveres
 
