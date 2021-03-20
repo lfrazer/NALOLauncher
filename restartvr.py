@@ -10,6 +10,7 @@ import ctypes.wintypes
 import argparse
 import psutil
 import winreg
+import shlex
 import nalostart
 
 #flags for win32 proc creation aren't available in "subprocess" yet in Python 3.6 unfortunately
@@ -49,12 +50,24 @@ def startsteam():
         subprocess.Popen(proc_args, creationflags=CREATE_NEW_CONSOLE | CREATE_NEW_PROCESS_GROUP)
         #os.system(steam_exe_path)
 
+def startsteam_startmenu(nsobject):
+    #nsobject.clickbutton("start_menu_icon.PNG")
+    pyautogui.press(['winleft'])
+    time.sleep(0.3)
+    nsobject.clickbutton("start_menu_steam.PNG")
+
 def startvivewireless():
     wifi_util_path = "C:\\Program Files\\VIVE Wireless\\ConnectionUtility\\HtcConnectionUtility.exe"
-    proc_args = ['cmd', '/c', 'start', wifi_util_path, "/force"]
+    proc_args = [wifi_util_path, "/force"]
     #subprocess.run(proc_args)
-    subprocess.Popen(proc_args, creationflags=CREATE_NEW_CONSOLE | CREATE_NEW_PROCESS_GROUP)
+    subprocess.Popen(proc_args, creationflags=DETACHED_PROCESS)
     #os.system(wifi_util_path)
+
+def startvivewireless_startmenu(nsobject):
+    #nsobject.clickbutton("start_menu_icon.PNG")
+    pyautogui.press(['winleft'])
+    time.sleep(0.3)
+    nsobject.clickbutton("start_menu_vivewifi.PNG")
 
 if __name__ == "__main__":
     ns = nalostart.NALOStart()
@@ -76,8 +89,8 @@ if __name__ == "__main__":
     if isprocrunning("vrserver.exe"):
         nalostart.killprocbyname("vrserver.exe")
 
-    #startsteam()
-    #startvivewireless()
+    startsteam_startmenu(ns)
+    startvivewireless_startmenu(ns)
     time.sleep(1.0)
 
 
