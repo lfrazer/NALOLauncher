@@ -187,7 +187,7 @@ if __name__ == "__main__":
     # wait a bit for NALO to initalize
     time.sleep(3.0)
 
-    # check for steam VR errors
+    # check for steam VR errors - checkerr() will now click on the NALO option to restart steamVR if it appears, however this often crashes everything unfortunately..
     if(args.steamerrcheck != "" and ns.checkerr(args.steamerrcheck)):
         # restart steamvr and try again..?
         #killprocbyname("natural_locomotion_launcher.exe")
