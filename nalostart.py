@@ -122,6 +122,9 @@ class NALOStart:
             self.movemouse(lefthandimg, 1, lefthandcheckboxpos)
             time.sleep(0.25)
             pyautogui.click()
+            print("Toggled left-handed mode, IMG=" + lefthandimg)
+        else:
+            print("Either could not find or did not need to toggle left-handed mode, IMG=" + lefthandimg)
 
         return startclickres
 
