@@ -18,7 +18,7 @@ class NALOStart:
     scroll_clicks = -100
 
     # set this to true only if your monitors are in a strange order (for example, #2 is to the left of #1)
-    disordered_monitors = True
+    disordered_monitors = False
 
     def __init__(self):
         configfile = "config.json"
