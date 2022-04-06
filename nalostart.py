@@ -175,6 +175,20 @@ if __name__ == "__main__":
     args = argparser.parse_args()
     print("Program Args: " + str(args))
 
+    # Start steamvr if its not running
+    steamvr_running = False
+    for proc in psutil.process_iter(['pid', 'name']):
+        if proc.info["name"] == "vrserver.exe":
+            steamvr_running = True
+            break
+
+    if not steamvr_running:
+        #steamvr App ID: 250820
+        proc_args = ['cmd', '/c', 'start', 'steam://run/250820']
+        subprocess.Popen(proc_args)
+        time.sleep(5.0) # wait a while for steam vr to start and hopefully track controllers
+
+
     # try to kill NALO if its running
     killprocbyname("natural_locomotion_launcher.exe")
     killprocbyname("naturallocomotion.exe")
