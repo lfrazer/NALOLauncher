@@ -1,6 +1,7 @@
 import os
 import subprocess
 import pyautogui
+import pygetwindow
 import time
 import sys
 import json
@@ -10,9 +11,12 @@ import ctypes.wintypes
 import argparse
 import psutil
 
+# Tested on Python 3.6 and 3.10 - See packages required above (chilimangoes is included)
+
 class NALOStart:
 
     nalo_folder = "G:\\Games\\SteamLibrary\\steamapps\\common\\Natural Locomotion\\"
+    nalo_window_title = "Natural Locomotion"
     nalo_exe = ""
     nalo_settings = ""
     scroll_clicks = -100
@@ -99,7 +103,7 @@ class NALOStart:
 
     def startprofile(self, game_select, scroll_steps, left_handed_flag):
         
-        # need to put the mouse over the game selection scroll UI before scrolling.. or it won't work
+        # need to put the mouse over the game selection scroll UI before scrolling.. or it won't work - blade & sorcery should (hopefully) always be visible - this could be better though
         if scroll_steps != 0:
             self.movemouse("bladesorcery_select.png")
             time.sleep(0.1)
@@ -147,6 +151,17 @@ class NALOStart:
         
         return True
 
+    def closewindow(self):
+        nalo_windows = pygetwindow.getWindowsWithTitle(self.nalo_window_title)
+        
+        if len(nalo_windows) > 0:
+            for window in nalo_windows:
+                window.close()
+                print("Closing existing NALO window..")
+        else:
+            print("Could not find any existing NALO windows!")
+
+        
 
 def killprocbyname(procname):
     procs_tokill = []
@@ -189,11 +204,13 @@ if __name__ == "__main__":
         time.sleep(5.0) # wait a while for steam vr to start and hopefully track controllers
 
 
-    # try to kill NALO if its running
-    killprocbyname("natural_locomotion_launcher.exe")
-    killprocbyname("naturallocomotion.exe")
 
-    ns = NALOStart() 
+
+    ns = NALOStart()
+
+    # try to kill NALO if its running
+    ns.closewindow()
+
     ns.setNALOHandedConfig( bool(args.lefthanded) )
     ns.startNALO()
 
