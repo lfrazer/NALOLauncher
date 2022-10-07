@@ -229,6 +229,10 @@ if __name__ == "__main__":
         if args.progarg != "":
             proglaunch_cmd.append(args.progarg)
         subprocess.Popen(proglaunch_cmd)
+    else:
+        print("Warning: startprofile() failed or proglaunch was unset..")
+
+    time.sleep(30.0) # sleep a while to check logs..
 
 
 
