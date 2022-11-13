@@ -161,19 +161,6 @@ class NALOStart:
         else:
             print("Could not find any existing NALO windows!")
 
-        
-
-def killprocbyname(procname):
-    procs_tokill = []
-
-    for proc in psutil.process_iter(['pid', 'name']):
-        if proc.info["name"] == procname:
-            procs_tokill.append(proc)
-            print("Found process [to be killed] running.. PID=" + str(proc.info["pid"]))
-
-    for proc in procs_tokill:
-        proc.terminate()
-
 
 if __name__ == "__main__":
 
@@ -203,9 +190,6 @@ if __name__ == "__main__":
         subprocess.Popen(proc_args)
         time.sleep(5.0) # wait a while for steam vr to start and hopefully track controllers
 
-
-
-
     ns = NALOStart()
 
     # try to kill NALO if its running
@@ -223,11 +207,6 @@ if __name__ == "__main__":
 
     # check for steam VR errors - checkerr() will now click on the NALO option to restart steamVR if it appears, however this often crashes everything unfortunately..
     if(args.steamerrcheck != "" and ns.checkerr(args.steamerrcheck)):
-        # restart steamvr and try again..?
-        #killprocbyname("natural_locomotion_launcher.exe")
-        #killprocbyname("naturallocomotion.exe")
-        #killprocbyname("vrserver.exe")
-        #killprocbyname("HtcConnectionUtility.exe")
         print("SteamVR error.. trying to restart everything..")
         time.sleep(45.0)
         #input("Press any key to exit..")
