@@ -188,7 +188,7 @@ if __name__ == "__main__":
         #steamvr App ID: 250820
         proc_args = ['cmd', '/c', 'start', 'steam://run/250820']
         subprocess.Popen(proc_args)
-        time.sleep(5.0) # wait a while for steam vr to start and hopefully track controllers
+        time.sleep(10.0) # wait a while for steam vr to start and hopefully track controllers
 
     ns = NALOStart()
 
